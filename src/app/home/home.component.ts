@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { ArticleListConfig, TagsService, UserService } from '../core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home-page',
@@ -12,7 +13,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private router: Router,
     private tagsService: TagsService,
-    private userService: UserService
+    private userService: UserService,
+    private http: HttpClient
   ) {}
 
   isAuthenticated: boolean;
@@ -20,38 +22,15 @@ export class HomeComponent implements OnInit {
     type: 'all',
     filters: {}
   };
-  tags: Array<string> = [];
+  tags = [];
   tagsLoaded = false;
 
   ngOnInit() {
-    this.userService.isAuthenticated.subscribe(
-      (authenticated) => {
-        this.isAuthenticated = authenticated;
-
-        // set the article list accordingly
-        if (authenticated) {
-          this.setListTo('feed');
-        } else {
-          this.setListTo('all');
-        }
-      }
-    );
-
-    this.tagsService.getAll()
-    .subscribe(tags => {
-      this.tags = tags;
+    this.http.get("http://ad2020-env.eba-feeu4hxz.eu-west-1.elasticbeanstalk.com/").toPromise().then((res) => {
+      this.tags = [].concat(res);
       this.tagsLoaded = true;
-    });
+    }, () => {})
   }
 
-  setListTo(type: string = '', filters: Object = {}) {
-    // If feed is requested but user is not authenticated, redirect to login
-    if (type === 'feed' && !this.isAuthenticated) {
-      this.router.navigateByUrl('/login');
-      return;
-    }
 
-    // Otherwise, set the list object
-    this.listConfig = {type: type, filters: filters};
-  }
 }
