@@ -26,7 +26,7 @@ export class HomeComponent implements OnInit {
   tagsLoaded = false;
 
   ngOnInit() {
-    this.http.get('http://localhost:3000').toPromise().then((res) => {
+    this.http.get('http://adapi-prod.eba-a4emyq6n.eu-west-1.elasticbeanstalk.com/').toPromise().then((res) => {
       this.tags = [].concat(res);
       this.tagsLoaded = true;
     }, () => {});
